@@ -53,11 +53,11 @@ clean:
 	rm -f $(OBJS)
 	rm -rf $(BUILD_DIR)
 
-emu: $(KERN_IMG)
+emu: $(KERN_ELF)
 	qemu-system-arm \
 		-machine realview-eb \
 		-cpu $(QEMU_CPU) \
-		-kernel $(KERN_IMG) \
+		-kernel $(KERN_ELF) \
 		-m 256
 
 stats:
