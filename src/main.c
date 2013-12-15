@@ -83,14 +83,12 @@ int uart_readline(UART_TypeDef *dev, char *buffer, int maxlen) {
 
     while (nread < maxlen) {
         char ch = uart_getc(dev);
-        buffer[nread++] = ch;
-        // this can overflow but fuck it
-        if (ch == '\r') {
+        if (ch == '\r' || ch == '\n') {
             buffer[nread++] = '\n';
             break;
+        } else {
+            buffer[nread++] = ch;
         }
-        // if (ch == '\n' || ch == '\r')
-        //     break;
     }
 
     buffer[nread] = 0;
