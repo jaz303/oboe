@@ -55,9 +55,10 @@ clean:
 
 emu: $(KERN_ELF)
 	qemu-system-arm \
-		-machine realview-eb \
+		-machine integratorcp \
 		-cpu $(QEMU_CPU) \
 		-kernel $(KERN_ELF) \
+		-serial stdio \
 		-m 256
 
 stats:
