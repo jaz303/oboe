@@ -21,7 +21,7 @@ OBJS		:= $(patsubst %.s,%.o,$(SRC_ASM))
 OBJS		+= $(patsubst %.c,%.o,$(SRC_C))
 
 INCLUDE		:= -I include
-BASEFLAGS	:= -O2 -fpic -pedantic -pedantic-errors -nostdlib
+BASEFLAGS	:= -O2 -fpic -nostdlib
 BASEFLAGS	+= -nostartfiles -ffreestanding -nodefaultlibs
 BASEFLAGS	+= -fno-builtin -fomit-frame-pointer -mcpu=$(CPU)
 WARNFLAGS	:= -Wall -Wextra
