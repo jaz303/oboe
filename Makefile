@@ -6,12 +6,12 @@ KERN_BASE	:= $(BUILD_DIR)/kernel
 KERN_ELF 	:= $(KERN_BASE).elf
 KERN_IMG	:= $(KERN_BASE).img
 
-CPU			:= arm926ej-s
+CPU		:= arm926ej-s
 QEMU_CPU	:= arm926
 
-CC			:= $(ARMGNU)-gcc
-LD			:= $(ARMGNU)-ld
-AS 			:= $(ARMGNU)-as
+CC		:= $(ARMGNU)-gcc
+LD		:= $(ARMGNU)-ld
+AS 		:= $(ARMGNU)-as
 OBJCOPY		:= $(ARMGNU)-objcopy
 
 SRC_ASM		:= $(wildcard **/*.s)
