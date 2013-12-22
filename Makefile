@@ -38,6 +38,9 @@ CFLAGS		+= -std=gnu99
 
 all: $(KERN_IMG)
 
+font/font_8x16.ld: font/font_8x16.png
+	./scripts/mkfont font/font_8x16.png > font/font_8x16.ld
+
 $(BUILD_DIR):
 	mkdir -p $@
 

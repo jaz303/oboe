@@ -1,0 +1,24 @@
+#!/usr/bin/env php
+<?php
+
+$image = imagecreatefrompng($_SERVER['argv'][1]);
+
+$width = imagesx($image);
+$height = imagesy($image);
+
+for ($j = 0; $j < $height; ++$j) {
+    for ($i = 0; $i < $width; $i += 8) {
+        
+        $byte =   (imagecolorat($image, $i + 0, $j) << 7)
+                | (imagecolorat($image, $i + 1, $j) << 6)
+                | (imagecolorat($image, $i + 2, $j) << 5)
+                | (imagecolorat($image, $i + 3, $j) << 4)
+                | (imagecolorat($image, $i + 4, $j) << 3)
+                | (imagecolorat($image, $i + 5, $j) << 2)
+                | (imagecolorat($image, $i + 6, $j) << 1)
+                | (imagecolorat($image, $i + 7, $j) << 0);
+
+        echo sprintf("BYTE(0x%02X)\n", $byte);
+    
+    }
+}
