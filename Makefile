@@ -13,6 +13,7 @@ CC		:= $(ARMGNU)-gcc
 LD		:= $(ARMGNU)-ld
 AS 		:= $(ARMGNU)-as
 OBJCOPY		:= $(ARMGNU)-objcopy
+NM			:= $(ARMGNU)-nm
 
 SRC_ASM		:= $(wildcard **/*.s)
 SRC_C		:= $(wildcard **/*.c)
@@ -63,6 +64,9 @@ emu: $(KERN_ELF)
 		-kernel $(KERN_ELF) \
 		-serial stdio \
 		-m 256
+
+symbols:
+	$(NM) -n $(KERN_ELF)
 
 stats:
 	@echo "Source (C)   =>" $(SRC_C)
