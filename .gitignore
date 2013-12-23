@@ -1,2 +1,3 @@
 *.o
 kernel.*
+.DS_Store
