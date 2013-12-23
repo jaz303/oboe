@@ -25,6 +25,11 @@ SECTIONS
     .rodata :
     {
         *(.rodata)
+
+        /* Font */
+        _font_start = .;
+        INCLUDE "font/font_8x16.ld";
+        _font_end = .;
     }
     .= ALIGN(4096);
     _rodata_end = .;
@@ -52,15 +57,4 @@ SECTIONS
 
     _end = .;
 
-    /* Font */
-
-    . = 0x00100000;
-    _font_start = .;
-    .text :
-    {
-        INCLUDE "font/font_8x16.ld";
-    }
-    .= ALIGN(4096);
-    ._font_end = .;
-    
 }

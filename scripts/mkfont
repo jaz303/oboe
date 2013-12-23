@@ -6,19 +6,30 @@ $image = imagecreatefrompng($_SERVER['argv'][1]);
 $width = imagesx($image);
 $height = imagesy($image);
 
-for ($j = 0; $j < $height; ++$j) {
-    for ($i = 0; $i < $width; $i += 8) {
-        
-        $byte =   (imagecolorat($image, $i + 0, $j) << 7)
-                | (imagecolorat($image, $i + 1, $j) << 6)
-                | (imagecolorat($image, $i + 2, $j) << 5)
-                | (imagecolorat($image, $i + 3, $j) << 4)
-                | (imagecolorat($image, $i + 4, $j) << 3)
-                | (imagecolorat($image, $i + 5, $j) << 2)
-                | (imagecolorat($image, $i + 6, $j) << 1)
-                | (imagecolorat($image, $i + 7, $j) << 0);
+$cw = $width / 8;
+$ch = $height / 16;
 
-        echo sprintf("BYTE(0x%02X)\n", $byte);
-    
+for ($y = 0; $y < $height; $y += 16) {
+    for ($x = 0; $x < $width; $x += 8) {
+
+        echo "/* " . ($x/8) . "," . ($y/16) . " */\n";
+
+        for ($r = 0; $r < 16; ++$r) {
+
+            $byte =   (imagecolorat($image, $x + 0, $y + $r) << 7)
+                    | (imagecolorat($image, $x + 1, $y + $r) << 6)
+                    | (imagecolorat($image, $x + 2, $y + $r) << 5)
+                    | (imagecolorat($image, $x + 3, $y + $r) << 4)
+                    | (imagecolorat($image, $x + 4, $y + $r) << 3)
+                    | (imagecolorat($image, $x + 5, $y + $r) << 2)
+                    | (imagecolorat($image, $x + 6, $y + $r) << 1)
+                    | (imagecolorat($image, $x + 7, $y + $r) << 0);
+
+            echo sprintf("BYTE(0x%02X);\n", $byte);
+
+        }
+
+        echo "\n";
+
     }
 }
