@@ -4,6 +4,9 @@
 #define __W     volatile
 #define __RW    volatile
 
+// base address of 8x16 font
+extern const int _font_start;
+
 //
 //
 
@@ -145,13 +148,7 @@ void uart_write(UART_TypeDef *dev, const char *str) {
 typedef int(*PFN)(void);
  
 void start(void);
- 
- 
-void __attribute__((naked)) entry()
-{
-    __asm__("mov    sp, #0x60 << 8");
-    __asm__("bl start");
-}
+
  
 #define PL110_CR_EN     0x001
 #define PL110_CR_PWR        0x800
@@ -173,7 +170,46 @@ typedef struct _PL110MMIO
     uint32      volatile g;     //18
     uint32      volatile control;   //1c
 } PL110MMIO;
+
+#define RGB(r,g,b) \
+    (((b)&0x1f)<<11)|(((g)&0x1f)<<6)|(((r)&0x1f))
+
+uint16_t palette[] = {
+    RGB(0x1f, 0x00, 0x00),
+    RGB(0x1f, 0x1f, 0x00)
+};
  
+void console_draw_char(int y, int x, char c) {
+
+    // get the base address of the font
+    char *font = (char*)(&_font_start);
+
+    // now calculate the base address of the character
+    // each char is 8x16 bits == 16 bytes
+    font += (c * 16);
+
+    // framebuffer base
+    uint16 volatile *fb = (uint16_t*)0x200000;
+
+    // now calculate offset of top-left pixel
+    fb += (16*640*y)+(8*x);
+
+    // finally copy character onto screen buffer
+    // TODO: this is revoltingly slow...!
+    for (int j = 0; j < 16; ++j) {
+        uint8_t line = font[j];
+        fb[j*640 + 0] = palette[(line >> 7) & 1];
+        fb[j*640 + 1] = palette[(line >> 6) & 1];
+        fb[j*640 + 2] = palette[(line >> 5) & 1];
+        fb[j*640 + 3] = palette[(line >> 4) & 1];
+        fb[j*640 + 4] = palette[(line >> 3) & 1];
+        fb[j*640 + 5] = palette[(line >> 2) & 1];
+        fb[j*640 + 6] = palette[(line >> 1) & 1];
+        fb[j*640 + 7] = palette[(line >> 0) & 1];
+    }
+
+}
+
 void start(void)
 {
     PFN     fn;
@@ -190,13 +226,27 @@ void start(void)
     /* 16-bit color */
     plio->control = 0x1829;
     fb = (uint16*)0x200000;
-    for (x = 0; x < (640 * 480) - 10; ++x)
-        fb[x] = 0x1f << (5 + 6) | 0xf << 5;
- 
+    for (x = 0; x < (640 * 480) - 10; ++x) {
+        fb[x] = RGB(0x1f,0,0);
+    }
+
+    console_draw_char(0, 0, 'H');
+    console_draw_char(0, 1, 'e');
+    console_draw_char(0, 2, 'l');
+    console_draw_char(0, 3, 'l');
+    console_draw_char(0, 4, 'o');
+    console_draw_char(0, 5, ' ');
+    console_draw_char(0, 6, 'W');
+    console_draw_char(0, 7, 'o');
+    console_draw_char(0, 8, 'r');
+    console_draw_char(0, 9, 'l');
+    console_draw_char(0, 10, 'd');
+    console_draw_char(0, 11, '!');
+
     /* uncomment this and the function pointer should crash QEMU if you set it for 8MB of ram or less */
-    for(;;);
-    fn = (PFN)0x800f20;
-    fn();
+    // for(;;);
+    // fn = (PFN)0x800f20;
+    // fn();
     return;
 }
 
