@@ -13,10 +13,10 @@ CC		:= $(ARMGNU)-gcc
 LD		:= $(ARMGNU)-ld
 AS 		:= $(ARMGNU)-as
 OBJCOPY		:= $(ARMGNU)-objcopy
-NM			:= $(ARMGNU)-nm
+NM		:= $(ARMGNU)-nm
 
-SRC_ASM		:= $(wildcard **/*.s)
-SRC_C		:= $(wildcard **/*.c)
+SRC_ASM		:= $(shell find src -name '*.s')
+SRC_C		:= $(shell find src -name '*.c')
 
 OBJS		:= $(patsubst %.s,%.o,$(SRC_ASM))
 OBJS		+= $(patsubst %.c,%.o,$(SRC_C))

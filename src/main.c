@@ -1,11 +1,7 @@
 #include <stdint.h>
 
-#define __R     volatile const
-#define __W     volatile
-#define __RW    volatile
-
-// base address of 8x16 font
-extern const int _font_start;
+#include "oboe/macros.h"
+#include "oboe/drivers/lcd_PL110.h"
 
 //
 //
@@ -20,33 +16,6 @@ typedef struct PeripheralID {
     __R     uint32_t        PCellID2;
     __R     uint32_t        PCellID3;
 } PeripheralID_t;
-
-//
-// LCD
-
-typedef struct {
-    __RW    uint32_t        Timing0;            // horizontal axis panel control
-    __RW    uint32_t        Timing1;            // vertical axis panel control
-    __RW    uint32_t        Timing2;            // clock and signal polarity control
-    __RW    uint32_t        Timing3;            // line end control
-    __RW    uint32_t        UPBASE;             // upper panel frame base address
-    __RW    uint32_t        LPBASE;             // lower panel frame base address
-    __RW    uint32_t        IMSC;               // interrupt enable mask
-    __RW    uint32_t        Control;            // LCD panel pixel params
-    __R     uint32_t        RIS;                // raw interrupt status
-    __R     uint32_t        MIS;                // final masked interrupts
-    __W     uint32_t        ICR;                
-    __R     uint32_t        UPCURR;             // LCD upper panel current address value
-    __R     uint32_t        LPCURR;             // LCD lower panel current address value
-            uint32_t        RESERVED0[115];
-    __RW    uint32_t        Palette;
-
-    __R     PeripheralID_t PeripheralID;
-
-} IntegratorLCD_t;
-
-#define LCD_BASE            0xC0000000
-#define LCD                 ((IntegratorLCD_t*) LCD_BASE)
 
 //
 // UART
@@ -145,118 +114,29 @@ void uart_write(UART_TypeDef *dev, const char *str) {
     }
 }
 
-typedef int(*PFN)(void);
- 
-void start(void);
-
- 
-#define PL110_CR_EN     0x001
-#define PL110_CR_PWR        0x800
-#define PL110_IOBASE        0xc0000000
-#define PL110_PALBASE       (PL110_IOBASE + 0x200)
- 
-typedef unsigned int        uint32;
-typedef unsigned char       uint8;
-typedef unsigned short      uint16;
- 
-typedef struct _PL110MMIO 
-{
-    uint32      volatile tim0;      //0
-    uint32      volatile tim1;      //4
-    uint32      volatile tim2;      //8
-    uint32      volatile d;     //c
-    uint32      volatile upbase;    //10
-    uint32      volatile f;     //14
-    uint32      volatile g;     //18
-    uint32      volatile control;   //1c
-} PL110MMIO;
-
-#define RGB(r,g,b) \
-    (((b)&0x1f)<<11)|(((g)&0x1f)<<6)|(((r)&0x1f))
-
-uint16_t palette[] = {
-    RGB(0x1f, 0x00, 0x00),
-    RGB(0x1f, 0x1f, 0x00)
-};
- 
-void console_draw_char(int y, int x, char c) {
-
-    // get the base address of the font
-    char *font = (char*)(&_font_start);
-
-    // now calculate the base address of the character
-    // each char is 8x16 bits == 16 bytes
-    font += (c * 16);
-
-    // framebuffer base
-    uint16 volatile *fb = (uint16_t*)0x200000;
-
-    // now calculate offset of top-left pixel
-    fb += (16*640*y)+(8*x);
-
-    // finally copy character onto screen buffer
-    // TODO: this is revoltingly slow...!
-    for (int j = 0; j < 16; ++j) {
-        uint8_t line = font[j];
-        fb[j*640 + 0] = palette[(line >> 7) & 1];
-        fb[j*640 + 1] = palette[(line >> 6) & 1];
-        fb[j*640 + 2] = palette[(line >> 5) & 1];
-        fb[j*640 + 3] = palette[(line >> 4) & 1];
-        fb[j*640 + 4] = palette[(line >> 3) & 1];
-        fb[j*640 + 5] = palette[(line >> 2) & 1];
-        fb[j*640 + 6] = palette[(line >> 1) & 1];
-        fb[j*640 + 7] = palette[(line >> 0) & 1];
-    }
-
-}
-
-void start(void)
-{
-    PFN     fn;
-    PL110MMIO   *plio;
-    int     x;
-    uint16      volatile *fb;
- 
-    plio = (PL110MMIO*)PL110_IOBASE;
- 
-    /* 640x480 pixels */
-    plio->tim0 = 0x3f1f3f9c;
-    plio->tim1 = 0x080b61df;
-    plio->upbase = 0x200000;
-    /* 16-bit color */
-    plio->control = 0x1829;
-    fb = (uint16*)0x200000;
-    for (x = 0; x < (640 * 480) - 10; ++x) {
-        fb[x] = RGB(0x1f,0,0);
-    }
-
-    console_draw_char(0, 0, 'H');
-    console_draw_char(0, 1, 'e');
-    console_draw_char(0, 2, 'l');
-    console_draw_char(0, 3, 'l');
-    console_draw_char(0, 4, 'o');
-    console_draw_char(0, 5, ' ');
-    console_draw_char(0, 6, 'W');
-    console_draw_char(0, 7, 'o');
-    console_draw_char(0, 8, 'r');
-    console_draw_char(0, 9, 'l');
-    console_draw_char(0, 10, 'd');
-    console_draw_char(0, 11, '!');
-
-    /* uncomment this and the function pointer should crash QEMU if you set it for 8MB of ram or less */
-    // for(;;);
-    // fn = (PFN)0x800f20;
-    // fn();
-    return;
-}
+struct PL110 lcd;
 
 void kernel_main(void) {
+
+    pl110_init();
+    pl110_init_dev(&lcd, (void*)0xC0000000);
+
+    pl110_draw_char(&lcd, 0, 0, 'H');
+    pl110_draw_char(&lcd, 0, 1, 'e');
+    pl110_draw_char(&lcd, 0, 2, 'l');
+    pl110_draw_char(&lcd, 0, 3, 'l');
+    pl110_draw_char(&lcd, 0, 4, 'o');
+    pl110_draw_char(&lcd, 0, 5, ' ');
+    pl110_draw_char(&lcd, 0, 6, 'W');
+    pl110_draw_char(&lcd, 0, 7, 'o');
+    pl110_draw_char(&lcd, 0, 8, 'r');
+    pl110_draw_char(&lcd, 0, 9, 'l');
+    pl110_draw_char(&lcd, 0, 10, 'd');
+    pl110_draw_char(&lcd, 0, 11, '!');
 
     UART0->CR |= UART_EN; // enable uart0
 
     uart_write(UART0, buffer);
-
-    start();
 
     while (1) {
         uart_readline(UART0, buffer, BUFFER_SIZE - 1);
