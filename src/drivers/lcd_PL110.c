@@ -5,17 +5,9 @@
 #include <stdint.h>
 
 static uint16_t palette[] = {
-    BGR_16_565(0x1F, 0x00, 0x00),
+    BGR_16_565(0x00, 0x20, 0x10),
     BGR_16_565(0x1F, 0x1F, 0x00)
 };
-
-// static void pl110_init(struct PL110 *lcd, void *addr) {
-//     lcd->hw = (struct PL110_HW*)addr;
-// }
-
-// static void pl110_clear(struct PL110 *lcd) {
-
-// }
 
 void pl110_init() {
 
@@ -23,41 +15,27 @@ void pl110_init() {
 
 // #define PL110_CR_EN     0x001
 // #define PL110_CR_PWR        0x800
-// #define PL110_IOBASE        0xc0000000
 // #define PL110_PALBASE       (PL110_IOB
 
-// typedef struct _PL110MMIO 
-// {
-//     uint32      volatile tim0;      //0
-//     uint32      volatile tim1;      //4
-//     uint32      volatile tim2;      //8
-//     uint32      volatile d;     //c
-//     uint32      volatile upbase;    //10
-//     uint32      volatile f;     //14
-//     uint32      volatile g;     //18
-//     uint32      volatile control;   //1c
-// } PL110MMIO;
-
 void pl110_init_dev(struct PL110 *lcd, void *base) {
-    lcd->hw = (struct PL110_HW*)base;
+    
+    struct PL110_HW *hw = lcd->hw = (struct PL110_HW*)base;
 
-    // PFN     fn;
-    // PL110MMIO   *plio;
-    // int     x;
-    // uint16      volatile *fb;
-    
-    // plio = (PL110MMIO*)PL110_IOBASE;
-    
-    // /* 640x480 pixels */
-    // plio->tim0 = 0x3f1f3f9c;
-    // plio->tim1 = 0x080b61df;
-    // plio->upbase = 0x200000;
-    // /* 16-bit color */
-    // plio->control = 0x1829;
-    // fb = (uint16*)0x200000;
-    // for (x = 0; x < (640 * 480) - 10; ++x) {
-    //     fb[x] = RGB(0x1f,0,0);
-    // }
+    /* 640x480 pixels */
+    hw->Timing0 = 0x3f1f3f9c;
+    hw->Timing1 = 0x080b61df;
+    hw->UPBASE = 0x200000;
+
+    /* 16 bit color */
+    hw->Control = 0x1829;
+
+    /* width and height */
+    lcd->width = 640;
+    lcd->height = 480;
+
+    /* clear */
+    pl110_clear(lcd, 0, 128, 128);
+
 }
 
 void pl110_clear(struct PL110 *lcd, uint8_t r, uint8_t g, uint8_t b) {

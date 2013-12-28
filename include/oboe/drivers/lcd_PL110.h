@@ -6,16 +6,16 @@
 #include "oboe/macros.h"
 
 struct PL110_HW {
-    __RW    uint32_t        Timing0;            // horizontal axis panel control
-    __RW    uint32_t        Timing1;            // vertical axis panel control
-    __RW    uint32_t        Timing2;            // clock and signal polarity control
-    __RW    uint32_t        Timing3;            // line end control
-    __RW    uint32_t        UPBASE;             // upper panel frame base address
-    __RW    uint32_t        LPBASE;             // lower panel frame base address
-    __RW    uint32_t        IMSC;               // interrupt enable mask
-    __RW    uint32_t        Control;            // LCD panel pixel params
-    __R     uint32_t        RIS;                // raw interrupt status
-    __R     uint32_t        MIS;                // final masked interrupts
+    __RW    uint32_t        Timing0;            // 0x00 horizontal axis panel control
+    __RW    uint32_t        Timing1;            // 0x04 vertical axis panel control
+    __RW    uint32_t        Timing2;            // 0x08 clock and signal polarity control
+    __RW    uint32_t        Timing3;            // 0x0C line end control
+    __RW    uint32_t        UPBASE;             // 0x10 upper panel frame base address
+    __RW    uint32_t        LPBASE;             // 0x14 lower panel frame base address
+    __RW    uint32_t        IMSC;               // 0x18 interrupt enable mask
+    __RW    uint32_t        Control;            // 0x1C LCD panel pixel params
+    __R     uint32_t        RIS;                // 0x20 raw interrupt status
+    __R     uint32_t        MIS;                // 0x24 final masked interrupts
     __W     uint32_t        ICR;                
     __R     uint32_t        UPCURR;             // LCD upper panel current address value
     __R     uint32_t        LPCURR;             // LCD lower panel current address value
