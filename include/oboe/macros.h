@@ -1,6 +1,9 @@
 #ifndef __OBOE_MACROS_H__
 #define __OBOE_MACROS_H__
 
+//
+// Access control
+
 #define __R     volatile const
 #define __W     volatile
 #define __RW    volatile
