@@ -72,3 +72,6 @@ stats:
 	@echo "Source (C)   =>" $(SRC_C)
 	@echo "Source (ASM) =>" $(SRC_ASM)
 	@echo "Objects      =>" $(OBJS)
+
+todo:
+	@egrep "(TODO|HACK|FIXME)" $$(find . -name '*.c' -or -name '*.h' -or -name '*.s')
