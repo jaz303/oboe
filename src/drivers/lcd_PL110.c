@@ -1,6 +1,7 @@
 #include "oboe/drivers/lcd_PL110.h"
 #include "oboe/font.h"
 #include "oboe/macros.h"
+#include "oboe/util.h"
 
 #include <stdint.h>
 
@@ -96,13 +97,15 @@ void pl110_init_dev(struct PL110 *lcd, void *base) {
 
 void pl110_clear(struct PL110 *lcd, uint8_t r, uint8_t g, uint8_t b) {
     
-    uint16_t volatile *fb   = (uint16_t*)lcd->hw->UPBASE;
-    uint16_t color          = BGR_16_565_D(r, g, b);
-    uint32_t max            = lcd->width * lcd->height;
+    uint16_t color = BGR_16_565_D(r, g, b);
+    
+    kmemfill_wv((uint32_t*)lcd->hw->UPBASE,
+                (color << 16 | color),
+                (lcd->width * lcd->height) / 2);
 
-    for (uint32_t i = 0; i < max; ++i) {
-        fb[i] = color;
-    }
+    // for (uint32_t i = 0; i < max; ++i) {
+    //     fb[i] = color;
+    // }
 
 }
 
