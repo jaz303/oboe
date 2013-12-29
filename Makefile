@@ -6,8 +6,11 @@ KERN_BASE	:= $(BUILD_DIR)/kernel
 KERN_ELF 	:= $(KERN_BASE).elf
 KERN_IMG	:= $(KERN_BASE).img
 
-CPU		:= arm926ej-s
-QEMU_CPU	:= arm926
+#CPU		:= arm926ej-s
+#QEMU_CPU	:= arm926
+
+CPU 		:= cortex-a8
+QEMU_CPU 	:= cortex-a8
 
 CC		:= $(ARMGNU)-gcc
 LD		:= $(ARMGNU)-ld
