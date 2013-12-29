@@ -6,21 +6,20 @@
 #include "oboe/macros.h"
 
 struct PL110_HW {
-    __RW    uint32_t        Timing0;            // 0x00 horizontal axis panel control
-    __RW    uint32_t        Timing1;            // 0x04 vertical axis panel control
-    __RW    uint32_t        Timing2;            // 0x08 clock and signal polarity control
-    __RW    uint32_t        Timing3;            // 0x0C line end control
-    __RW    uint32_t        UPBASE;             // 0x10 upper panel frame base address
-    __RW    uint32_t        LPBASE;             // 0x14 lower panel frame base address
-    __RW    uint32_t        IMSC;               // 0x18 interrupt enable mask
-    __RW    uint32_t        Control;            // 0x1C LCD panel pixel params
-    __R     uint32_t        RIS;                // 0x20 raw interrupt status
-    __R     uint32_t        MIS;                // 0x24 final masked interrupts
-    __W     uint32_t        ICR;                
-    __R     uint32_t        UPCURR;             // LCD upper panel current address value
-    __R     uint32_t        LPCURR;             // LCD lower panel current address value
-            uint32_t        RESERVED0[115];
-    __RW    uint32_t        Palette;
+    __RW    uint32_t        Timing0;            // 0x000 horizontal axis panel control
+    __RW    uint32_t        Timing1;            // 0x004 vertical axis panel control
+    __RW    uint32_t        Timing2;            // 0x008 clock and signal polarity control
+    __RW    uint32_t        Timing3;            // 0x00C line end control
+    __RW    uint32_t        UPBASE;             // 0x010 upper panel frame base address
+    __RW    uint32_t        LPBASE;             // 0x014 lower panel frame base address
+    __RW    uint32_t        INTRENABLE;         // 0x018 interrupt enable mask
+    __RW    uint32_t        Control;            // 0x01C LCD panel pixel params
+    __RW    uint32_t        Status;             // 0x020 raw interrupt status
+    __R     uint32_t        Interrupt;          // 0x024 final masked interrupts
+    __R     uint32_t        UPCURR;             // 0x028 LCD upper panel current address value
+    __R     uint32_t        LPCURR;             // 0x02C LCD lower panel current address value
+            uint32_t        RESERVED0[116];
+    __RW    uint32_t        Palette[128];       // 0x200 256x16 bit color palette
 };
 
 struct PL110 {
