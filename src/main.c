@@ -4,6 +4,44 @@
 #include "oboe/drivers/lcd_PL110.h"
 
 //
+// KMI
+
+typedef struct KMI {
+    __RW    uint32_t        CR;         /* 0x00 control register */
+    __R     uint32_t        STAT;       /* 0x04 status register */
+    __RW    uint32_t        DATA;       /* 0x08 received data / data to write */
+    __RW    uint32_t        CLKDIV;     /* 0x0C clock divisor */
+    __R     uint32_t        IIR;        /* 0x10 interrupt status register */
+} KMI_t;
+
+// Control
+#define KMI_KMITYPE         (1 << 5)
+#define KMI_KMIRXINTREn     (1 << 4)
+#define KMI_KMITXINTREn     (1 << 3)
+#define KMI_KmiEn           (1 << 2)
+#define KMI_FKMID           (1 << 1)
+#define KMI_FKMIC           (1 << 0)
+
+// Status
+#define KMI_TXEMPTY         (1 << 6)
+#define KMI_TXBUSY          (1 << 5)
+#define KMI_RXFULL          (1 << 4)
+#define KMI_RXBUSY          (1 << 3)
+#define KMI_RXPARITY        (1 << 2)
+#define KMI_KMIC            (1 << 1)
+#define KMI_KMID            (1 << 0)
+
+// IIR
+#define KMITXINTR           (1 << 1)
+#define KMIRXINTR           (1 << 0)
+
+#define KMI_KEYBOARD_BASE   0x18000000
+#define KMI_MOUSE_BASE      0x19000000
+
+#define KEYBOARD            ((KMI_t*)   KMI_KEYBOARD_BASE)
+#define MOUSE               ((KMI_t*)   KMI_MOUSE_BASE)
+
+//
 //
 
 typedef struct PeripheralID {
@@ -134,13 +172,20 @@ void kernel_main(void) {
     pl110_draw_char(&lcd, 0, 10, 'd');
     pl110_draw_char(&lcd, 0, 11, '!');
 
-    UART0->CR |= UART_EN; // enable uart0
-
-    uart_write(UART0, buffer);
+    KEYBOARD->CR |= KMI_KmiEn;
 
     while (1) {
-        uart_readline(UART0, buffer, BUFFER_SIZE - 1);
-        uart_write(UART0, buffer);
+        while (!(KEYBOARD->STAT & KMI_RXFULL));
+        pl110_draw_char(&lcd, 0, 0, KEYBOARD->DATA);
     }
+
+    // UART0->CR |= UART_EN; // enable uart0
+
+    // uart_write(UART0, buffer);
+
+    // while (1) {
+    //     uart_readline(UART0, buffer, BUFFER_SIZE - 1);
+    //     uart_write(UART0, buffer);
+    // }
 
 }
