@@ -10,6 +10,7 @@ Initial plan is to get a simple UART-based test running in qemu then transfer to
 
   - Rudimentary blocking UART IO
   - 16-bit framebuffer with ASCII text output
+  - Keyboard character echo
 
 ![Oboe](https://raw.github.com/jaz303/oboe/master/screenshot.png)
 
