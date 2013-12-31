@@ -6,6 +6,50 @@
 //
 // KMI
 
+const unsigned char kKeyCodeLShift  = 42;
+const unsigned char kKeyCodeRShift  = 54;
+
+unsigned char KeyStateLShift = 0;
+unsigned char KeyStateRShift = 0;
+
+unsigned char keymap[] = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    'q', 'w', 'e', 'r', 't', 'y', 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+};
+
+unsigned char keymap_shift[] = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    'Q', 'W', 'E', 'R', 'T', 'Y', 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+};
+
 typedef struct KMI {
     __RW    uint32_t        CR;         /* 0x00 control register */
     __R     uint32_t        STAT;       /* 0x04 status register */
@@ -176,7 +220,23 @@ void kernel_main(void) {
 
     while (1) {
         while (!(KEYBOARD->STAT & KMI_RXFULL));
-        pl110_draw_char(&lcd, 0, 0, KEYBOARD->DATA);
+        uint8_t data = KEYBOARD->DATA;
+        uint8_t op = !(data & 0x80);
+        uint8_t ch = data & 0x7F;
+        if (ch == kKeyCodeLShift) {
+            KeyStateLShift = op;
+        } else if (ch == kKeyCodeRShift) {
+            KeyStateRShift = op;
+        } else {
+            if (KeyStateLShift || KeyStateRShift) {
+                ch = keymap_shift[ch];
+            } else {
+                ch = keymap[ch];
+            }
+            if (ch > 0) {
+                pl110_draw_char(&lcd, 0, 0, ch);
+            }
+        }
     }
 
     // UART0->CR |= UART_EN; // enable uart0
