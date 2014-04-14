@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
+void* kmemset(void *ptr, int value, uint32_t num);
+void* kmemset_v(void volatile *ptr, int value, uint32_t num);
+
 /*
  * beginning at address dst, fill memory with num copies of word val
  */
